@@ -14,8 +14,9 @@ Pretengo configuration `config.json`:
   "SignKey": "U0VSVklDRVNFUlZJQ0VTRVJWSUNFU0VSVklDRVNFUlZJQ0VTRVJWSUNFU0VSVklDRVNFUlZJQ0VTRVI="
 }
 ```
-When starting MHF on Cemu, Pretengo will listen and send the static response based on config above and using the SessionKey as SignIn Method for Erupe server.
+- When starting MHF on Cemu, Pretengo will listen and send the static response based on config above and using the SessionKey as SignIn Method for Erupe server.
 if the StaticKey is set to "no", the SignKey will be generated automatically from userID and password based on Cemu online files.
+- The default port used by nintendo is 443 or SSL port, you can change it but you must proxy the 443 into the destination port in order to function.
 
 ## How to Use
 1. first you need to redirect nintendo.account.net into your local IP wich pretengo listen to, easiest way is to use host file in %windir%/System32/Drivers/etc/hosts and add the following e.g. : ```127.0.0.1 account.nintendo.net```
