@@ -1,0 +1,9 @@
+{
+  "ListenAddress": "127.0.0.1",
+  "ListenPort": "443",
+  "access_token": "1234567890abcdef1234567890abcdef",
+  "refresh_token": "fedcba0987654321fedcba0987654321fedcba12",
+  "expires_in": "3600",
+  "StaticKey": "no",
+  "SessionKey": "U0VSVklDRVNFUlZJQ0VTRVJWSUNFU0VSVklDRVNFUlZJQ0VTRVJWSUNFU0VSVklDRVNFUlZJQ0VTRVI="
+}
