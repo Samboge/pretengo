@@ -18,11 +18,12 @@ import (
 type Config struct {
 	ListenAddress string `json:"ListenAddress"`
 	ListenPort    string `json:"ListenPort"`
+	GetServerlist string `json:"GetServerlist"`
 	AccessToken   string `json:"access_token"`
 	RefreshToken  string `json:"refresh_token"`
 	ExpiresIn     string `json:"expires_in"`
 	StaticKey	  string `json:"StaticKey"`
-	Key    string `json:"Key"`
+	Key  		  string `json:"Key"`
 }
 
 var userID string
@@ -71,6 +72,7 @@ func main() {
 	// Register request handler
 	http.HandleFunc("/v1/api/oauth20/access_token/generate", handleRequest)
 	http.HandleFunc("/v1/api/provider/service_token/@me", handleRequest)
+	http.HandleFunc("/serverlist.xml", handleRequest)
 
 	// Create a channel to receive the interrupt signal
 	interrupt := make(chan os.Signal, 1)
@@ -81,6 +83,16 @@ func main() {
 		if err != nil {
 			log.Fatal("Failed to start server:", err)
 			os.Exit(1) // Terminate the program with an error exit status
+		}
+	}()
+
+	go func() {
+		if AppConfig.GetServerlist == "true" {
+			err := http.ListenAndServe(":80", nil)
+			if err != nil {
+			log.Fatal("Failed to start server:", err)
+			os.Exit(1) // Terminate the program with an error exit status
+		}
 		}
 	}()
 
@@ -128,7 +140,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Received GET request:")
 		fmt.Println("Client ID:", clientID)
 
-		if AppConfig.StaticKey != "no" {
+		if AppConfig.StaticKey != "false" {
 			token = "U0VSVklDRVNFUlZJQ0VTRVJWSUNFU0VSVklDRVNFUlZJQ0VTRVJWSUNFU0VSVklDRVNFUlZJQ0VTRVI="
 		} else {
 			// Encode the client ID in base64
@@ -146,6 +158,26 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 
 		// Write the XML response
 		w.Write([]byte(response))
+	} else if r.URL.Path == "/serverlist.xml" {
+		response, err := http.Get("http://zerulight.cc/serverlist.xml")
+		if err != nil {
+		log.Fatal("Failed to fetch XML file:", err)
+		}
+		// Read the response body
+		defer response.Body.Close()
+		fmt.Println("Getting Serverlist.xml success")
+		xmlData, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			log.Fatal("Failed to read XML file:", err)
+		}
+
+		// Set response headers
+		w.Header().Set("Content-Type", "application/xml")
+		w.WriteHeader(http.StatusOK)
+
+		// Write the XML response
+		w.Write([]byte(xmlData))
+
 	} else {
 		http.Error(w, "Invalid request method or URL", http.StatusNotFound)
 		return
@@ -169,13 +201,13 @@ func loadConfig(filename string) error {
 		AppConfig = Config{
 			ListenAddress: "0.0.0.0",
 			ListenPort:    "443",
+			GetServerlist: "false",
 			AccessToken:   "1234567890abcdef1234567890abcdef",
 			RefreshToken:  "fedcba0987654321fedcba0987654321fedcba12",
 			ExpiresIn:     "3600",
 			StaticKey:     "yes",
 			Key:    "U0VSVklDRVNFUlZJQ0VTRVJWSUNFU0VSVklDRVNFUlZJQ0VTRVJWSUNFU0VSVklDRVNFUlZJQ0VTRVI=",
 		}
-
 		// Return nil to indicate success (since we manually input the values)
 		return nil
 	}
@@ -183,7 +215,8 @@ func loadConfig(filename string) error {
 	// Unmarshal the JSON data into the AppConfig variable
 	err = json.Unmarshal(data, &AppConfig)
 	if err != nil {
-		return err
+		fmt.Println("Failed to Load config into app")
+		return nil
 	}
 
 	return nil
