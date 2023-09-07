@@ -7,11 +7,13 @@ Pretengo configuration `config.json`:
 {
   "ListenAddress": "127.0.0.1",
   "ListenPort": "443",
+  "HttpPort": "80",
+  "GetServerlist": "true",
   "access_token": "1234567890abcdef1234567890abcdef",
   "refresh_token": "fedcba0987654321fedcba0987654321fedcba12",
   "expires_in": "3600",
-  "StaticKey": "no",
-  "SignKey": "U0VSVklDRVNFUlZJQ0VTRVJWSUNFU0VSVklDRVNFUlZJQ0VTRVJWSUNFU0VSVklDRVNFUlZJQ0VTRVI="
+  "StaticKey": "false",
+  "SessionKey": "U0VSVklDRVNFUlZJQ0VTRVJWSUNFU0VSVklDRVNFUlZJQ0VTRVJWSUNFU0VSVklDRVNFUlZJQ0VTRVI="
 }
 ```
 - When starting MHF on Cemu, Pretengo will listen and send the static response based on config above and using the SessionKey as SignIn Method for Erupe server.
