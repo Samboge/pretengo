@@ -18,12 +18,13 @@ import (
 type Config struct {
 	ListenAddress string `json:"ListenAddress"`
 	ListenPort    string `json:"ListenPort"`
+	HttpPort 	  string `json:"HttpPort"`
 	GetServerlist string `json:"GetServerlist"`
 	AccessToken   string `json:"access_token"`
 	RefreshToken  string `json:"refresh_token"`
 	ExpiresIn     string `json:"expires_in"`
 	StaticKey	  string `json:"StaticKey"`
-	Key  		  string `json:"Key"`
+	SessionKey    string `json:"SessionKey"`
 }
 
 var userID string
@@ -88,7 +89,7 @@ func main() {
 
 	go func() {
 		if AppConfig.GetServerlist == "true" {
-			err := http.ListenAndServe(":80", nil)
+			err := http.ListenAndServe(fmt.Sprintf("%s:%s", AppConfig.ListenAddress, AppConfig.HttpPort), nil)
 			if err != nil {
 			log.Fatal("Failed to start server:", err)
 			os.Exit(1) // Terminate the program with an error exit status
@@ -141,7 +142,8 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Client ID:", clientID)
 
 		if AppConfig.StaticKey != "false" {
-			token = AppConfig.Key
+			token = AppConfig.SessionKey
+			fmt.Println("Using Static SessionKey", AppConfig.SessionKey)
 		} else {
 			// Encode the client ID in base64
 	  		token = generateToken(userID, password)
@@ -201,12 +203,13 @@ func loadConfig(filename string) error {
 		AppConfig = Config{
 			ListenAddress: "0.0.0.0",
 			ListenPort:    "443",
+			HttpPort:	   "80",
 			GetServerlist: "false",
 			AccessToken:   "1234567890abcdef1234567890abcdef",
 			RefreshToken:  "fedcba0987654321fedcba0987654321fedcba12",
 			ExpiresIn:     "3600",
-			StaticKey:     "yes",
-			Key:    "U0VSVklDRVNFUlZJQ0VTRVJWSUNFU0VSVklDRVNFUlZJQ0VTRVJWSUNFU0VSVklDRVNFUlZJQ0VTRVI=",
+			StaticKey:     "true",
+			SessionKey:    "U0VSVklDRVNFUlZJQ0VTRVJWSUNFU0VSVklDRVNFUlZJQ0VTRVJWSUNFU0VSVklDRVNFUlZJQ0VTRVI=",
 		}
 		// Return nil to indicate success (since we manually input the values)
 		return nil
