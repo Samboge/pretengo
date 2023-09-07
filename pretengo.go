@@ -141,7 +141,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Client ID:", clientID)
 
 		if AppConfig.StaticKey != "false" {
-			token = "U0VSVklDRVNFUlZJQ0VTRVJWSUNFU0VSVklDRVNFUlZJQ0VTRVJWSUNFU0VSVklDRVNFUlZJQ0VTRVI="
+			token = AppConfig.Key
 		} else {
 			// Encode the client ID in base64
 	  		token = generateToken(userID, password)
